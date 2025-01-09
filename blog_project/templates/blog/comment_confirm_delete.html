@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Comment - Blog Project{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+    <h2 class="text-2xl font-bold mb-6">Delete Comment</h2>
+    <p class="mb-6 text-gray-700">Are you sure you want to delete this comment?</p>
+    
+    <div class="bg-gray-100 p-4 rounded mb-6">
+        <p class="text-gray-700">{{ comment.content }}</p>
+    </div>
+
+    <form method="post" class="flex justify-end space-x-4">
+        {% csrf_token %}
+        <a href="{% url 'post_detail' pk=comment.post.pk %}" 
+           class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+            Cancel
+        </a>
+        <button type="submit" 
+                class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+            Delete
+        </button>
+    </form>
+</div>
+{% endblock %}

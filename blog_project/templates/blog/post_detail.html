@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - Blog Project{% endblock title %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Post Content -->
+    <div class="bg-navy-800 rounded-lg shadow-md overflow-hidden mb-6 text-white"> <!-- Changed background -->
+        {% if post.featured_image %}
+        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-96 object-cover">
+        {% endif %}
+        
+        <div class="p-8">
+            <div class="flex items-center justify-between mb-4">
+                <span class="bg-black text-white text-sm font-medium px-3 py-1 rounded">
+                    {{ post.category.name }}
+                </span>
+                <span class="text-gray-300 text-sm">
+                    {{ post.created_at|date:"F j, Y" }}
+                </span>
+            </div>
+
+            <h1 class="text-4xl font-bold mb-4 text-white">{{ post.title }}</h1>
+            
+            <div class="flex items-center mb-8">
+                <span class="text-gray-300">By {{ post.author.username }}</span>
+            </div>
+
+            <div class="prose prose-invert max-w-none">
+                {{ post.content|linebreaks }}
+            </div>
+        </div>
+    </div>
+
+      <!-- Add this after the post content -->
+    <div class="flex space-x-4 mt-6">
+         <h3 class="text-white mr-2">Share this post:</h3>
+        <!-- Facebook -->
+         <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+            target="_blank"
+             class="px-4 py-2 bg-[#1877f2] text-white rounded hover:bg-[#166fe5] flex items-center space-x-2">
+            <span>Facebook</span>
+         </a>
+         <!-- Twitter -->
+         <a href="https://twitter.com/intent/tweet?text={{ post.title }}&url={{ request.build_absolute_uri }}"
+            target="_blank"
+         class="px-4 py-2 bg-[#1da1f2] text-white rounded hover:bg-[#1a91da] flex items-center space-x-2">
+         <span>Twitter</span>
+        </a>
+        <!-- LinkedIn -->
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ post.title }}"
+           target="_blank"
+           class="px-4 py-2 bg-[#0a66c2] text-white rounded hover:bg-[#095196] flex items-center space-x-2">
+          <span>LinkedIn</span>
+        </a>
+    </div>
+
+    <!-- Author Actions -->
+    {% if user == post.author %}
+    <div class="flex justify-end space-x-4 mb-8">
+        <a href="{% url 'post_edit' pk=post.pk %}" class="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">
+            Edit Post
+        </a>
+        <a href="{% url 'post_delete' pk=post.pk %}" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+            Delete Post
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Comments Section -->
+    <div class="bg-navy-800 rounded-lg shadow-md p-8 text-white"> <!-- Changed background -->
+        <h2 class="text-2xl font-bold mb-6">Comments</h2>
+        
+        {% if user.is_authenticated %}
+        <form method="post" class="mb-8">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Add a comment</label>
+                {{ comment_form.content }}
+            </div>
+            <button type="submit" class="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">
+                Post Comment
+            </button>
+        </form>
+        {% else %}
+        <p class="text-gray-300 mb-8">
+            Please <a href="{% url 'login' %}" class="text-blue-400 hover:text-blue-300">login</a> to comment.
+        </p>
+        {% endif %}
+
+        {% if comments %}
+            {% for comment in comments %}
+            <div class="border-t border-gray-600 py-4">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <span class="font-medium">{{ comment.author.username }}</span>
+                        <span class="text-gray-300 text-sm ml-2">
+                            {{ comment.created_at|date:"F j, Y" }}
+                        </span>
+                    </div>
+                    {% if user == comment.author %}
+                    <form method="get" action="{% url 'comment_delete' pk=comment.pk %}">
+                        <button type="submit" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
+                    </form>
+                    {% endif %}
+                </div>
+                <p class="text-gray-300">{{ comment.content }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-gray-300">No comments yet. Be the first to comment!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
