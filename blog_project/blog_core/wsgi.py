@@ -14,3 +14,7 @@ from django.core.wsgi import get_wsgi_application
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'blog_core.settings')
 
 application = get_wsgi_application()
+
+WSGI_APPLICATION = 'blog_core.wsgi.application'
+
+
